@@ -25,8 +25,6 @@ const styles = StyleSheet.create({
             color: '#fff'
         },
     }
-})
+});
 
-export function loadStyles(theme = 'dark') {
-    return styles[theme] || styles['light'];
-}
+export const getStyles = (darkMode) => styles[darkMode ? 'dark' : 'light']
