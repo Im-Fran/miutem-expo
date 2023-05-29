@@ -38,5 +38,6 @@ Una vez iniciado el servidor de expo, para iniciar la app en:
 - Android: escanea el codigo QR con la app de Expo GO
 - Web: Presiona en consola la letra `w`
 
-Si! Esta app tambien está diseñanada para funcionar en la web. Si todo va bien yo creo que podriamos lanzar una version de escritorio de esta app usando la funcion Web, probablemente (ya que es react native) solo crea un servidor 
-local y luego ejecuta react native con la web. No se, pero a futuro sabré el como crear la app para escritorio :)
+~~Si! Esta app tambien está diseñanada para funcionar en la web. Si todo va bien yo creo que podriamos lanzar una version de escritorio de esta app usando la funcion Web, probablemente (ya que es react native) solo crea un servidor 
+local y luego ejecuta react native con la web. No se, pero a futuro sabré el como crear la app para escritorio :)~~
+Por lo que acabo de encontrar expo.dev en la web es solo react native compilado en forma de sitio web, como twitter XD así que podre utilizar esta app en la web también, pero será optimizada para mobiles.
