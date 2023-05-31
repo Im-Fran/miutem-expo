@@ -1,17 +1,27 @@
+import {useEffect, useState} from "react";
+import useStoredState from "../src/storage/StoredState";
 import { getStyles } from "../src/utils/Styling";
 
-import {StatusBar} from 'expo-status-bar';
 import {Button, Text, View} from 'react-native';
-import {useMMKV, useMMKVBoolean} from "react-native-mmkv";
+import {StatusBar} from 'expo-status-bar';
+
+import Splash from "./splash";
 
 export default function App() {
-    const [darkMode, setDarkMode] = useMMKVBoolean('darkMode')
-    useMMKV().set()
+    const [isReady, setReady] = useState(false)
+    const [darkMode, setDarkMode] = useStoredState("darkMode", false)
 
-    return (
+    useEffect(() => {
+        setReady(false)
+        setTimeout(() => {
+            // setReady(true)
+        }, 5000)
+    }, [])
+
+    return isReady ? (
         <View style={getStyles(darkMode).container}>
-            <Text style={getStyles(darkMode).text} onPress={() => setDarkMode(prev => !prev)}>Hello, World!</Text>
+            <Text style={getStyles(darkMode).text} onPress={() => setDarkMode(!darkMode)}>Hello, World!</Text>
             <StatusBar style={darkMode ? 'light' : 'dark'}/>
         </View>
-    );
+    ) : <Splash/>;
 }
