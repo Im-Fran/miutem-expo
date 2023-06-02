@@ -1,23 +1,48 @@
 import {StatusBar} from "expo-status-bar";
-import {StyleSheet, Text, View} from "react-native";
+import {StyleSheet, Animated, View} from "react-native";
 import {LinearGradient} from 'expo-linear-gradient';
 import {Image} from "expo-image";
+import {useEffect, useRef, useState} from "react";
+import AnimatedView from "react-native-web/src/vendor/react-native/Animated/components/AnimatedView";
 
-const utemGif = require('../assets/splash/utem.gif');
+const isotipoNegativo = require('../assets/utem/utem_isotipo_negativo.png')
+const utemTexto = require('../assets/utem/UTEM_Texto.png')
 export default function Splash({ setReady }) {
+
+    const width = useRef(new Animated.Value(0)).current
+
+    useEffect(() => {
+        width.setValue(0)
+
+        Animated.sequence([
+            Animated.delay(1000),
+            Animated.timing(width, {
+                toValue: 300,
+                duration: 700,
+                useNativeDriver: false,
+            })
+        ]).start()
+    }, [width])
 
     return <View style={styles.container}>
         <LinearGradient colors={['#1D8E5C', '#06607a']} style={styles.background}/>
         <View style={styles.logoContainer}>
             <Image
-                source={utemGif}
-                style={{width: 300, height: 300}}
+                source={isotipoNegativo}
+                style={styles.isotipo}
                 contentFit={'contain'}
-                onLoadEnd={() => {
-                    setTimeout(() => {
-                        setReady(true)
-                    },  3750)
-                }}
+            />
+            <Animated.Image
+                source={utemTexto}
+                style={[
+                    {
+                        height: 75,
+                        maxWidth: 230,
+                        marginLeft: 5,
+                        width,
+                    },
+                ]}
+                resizeMode={'cover'}
             />
         </View>
         <StatusBar style={"dark"}/>
@@ -27,19 +52,28 @@ export default function Splash({ setReady }) {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: '100%'
     },
     background: {
-        position: "absolute",
-        width: "100%",
-        height: "100%",
+        position: 'absolute',
+        width: '100%',
+        height: '100%',
         left: 0,
         top: 0,
     },
     logoContainer: {
         flex: 1,
-        alignItems: 'center',
+        flexDirection: 'row',
         justifyContent: 'center',
+        alignItems: 'center',
+        width: '100%'
     },
+
+    isotipo: {
+        width: 65,
+        height: 65,
+    },
+
 })
