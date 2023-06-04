@@ -1,18 +1,21 @@
-import {StatusBar} from 'expo-status-bar';
-import {Button, StyleSheet, Text, View} from 'react-native';
 import {useEffect, useState} from "react";
-import {createStyles, loadStyles} from "../src/utils/Styling";
+import useStoredState from "../src/storage/StoredState";
+import { getStyles } from "../src/utils/Styling";
+
+import {Button, Text, View} from 'react-native';
+import {StatusBar} from 'expo-status-bar';
+import Splash from "./splash";
 
 export default function App() {
+    const [isReady, setReady] = useState(false)
+    const [darkMode, setDarkMode] = useStoredState("darkMode", false)
 
-    const [theme, setTheme] = useState('dark')
+    useEffect(() => {
+        setReady(false)
+    }, [])
 
-    const toggleTheme = () => setTheme(prev => prev === 'dark' ? 'light' : 'dark')
-
-    return (
-        <View style={loadStyles(theme).container}>
-            <Text style={loadStyles(theme).text} onPress={toggleTheme}>Hello, World!</Text>
-            <StatusBar style={theme === 'dark' ? 'light' : 'dark'}/>
-        </View>
-    );
+    return isReady ? <View style={getStyles(darkMode).container}>
+        <Text style={getStyles(darkMode).text} onPress={() => setDarkMode(!darkMode)}>Hello, World!</Text>
+        <StatusBar style={darkMode ? 'light' : 'dark'}/>
+    </View> : <Splash setReady={setReady}/>;
 }

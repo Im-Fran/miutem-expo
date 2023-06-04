@@ -1,4 +1,4 @@
-import {StyleSheet} from "react-native";
+import {PixelRatio, StyleSheet} from "react-native";
 
 const styles = StyleSheet.create({
     light: {
@@ -25,8 +25,8 @@ const styles = StyleSheet.create({
             color: '#fff'
         },
     }
-})
+});
 
-export function loadStyles(theme = 'dark') {
-    return styles[theme] || styles['light'];
-}
+export const getStyles = (darkMode) => styles[darkMode ? 'dark' : 'light']
+
+export const pixels = (px) => px / PixelRatio.get()
