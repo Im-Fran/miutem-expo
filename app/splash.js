@@ -1,8 +1,9 @@
+import {useEffect, useRef} from "react";
+import Constants from "expo-constants"
 import {StatusBar} from "expo-status-bar";
-import {StyleSheet, Animated, View} from "react-native";
+import {StyleSheet, Animated, View, Text} from "react-native";
 import {LinearGradient} from 'expo-linear-gradient';
 import {Image} from "expo-image";
-import {useEffect, useRef} from "react";
 
 const isotipoNegativo = require('../assets/utem/utem_isotipo_negativo.png')
 const utemTexto = require('../assets/utem/UTEM_Texto.png')
@@ -22,7 +23,7 @@ export default function Splash({ setReady }) {
                 duration: 700,
                 useNativeDriver: false,
             }),
-            Animated.delay(250),
+            Animated.delay(750),
             Animated.timing(opacity, {
                 toValue: 0,
                 duration: 500,
@@ -67,7 +68,14 @@ export default function Splash({ setReady }) {
                 />
             </Animated.View>
         </Animated.View>
-        <StatusBar style={"dark"}/>
+        <Animated.View style={[
+            {
+                opacity,
+            }
+        ]}>
+            <Text style={styles.version}>Versión <Text style={{ fontWeight: 'bold' }}>{Constants.expoConfig.version}</Text></Text>
+        </Animated.View>
+        <StatusBar hidden/>
     </View>
 }
 
@@ -98,4 +106,9 @@ const styles = StyleSheet.create({
         height: 65,
     },
 
+    version: {
+        marginBottom: 20,
+        color: 'white',
+        fontSize: 16,
+    },
 })
