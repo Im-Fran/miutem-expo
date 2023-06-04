@@ -2,17 +2,18 @@ import {StatusBar} from "expo-status-bar";
 import {StyleSheet, Animated, View} from "react-native";
 import {LinearGradient} from 'expo-linear-gradient';
 import {Image} from "expo-image";
-import {useEffect, useRef, useState} from "react";
-import AnimatedView from "react-native-web/src/vendor/react-native/Animated/components/AnimatedView";
+import {useEffect, useRef} from "react";
 
 const isotipoNegativo = require('../assets/utem/utem_isotipo_negativo.png')
 const utemTexto = require('../assets/utem/UTEM_Texto.png')
 export default function Splash({ setReady }) {
 
+    const opacity = useRef(new Animated.Value(1)).current
     const width = useRef(new Animated.Value(0)).current
 
     useEffect(() => {
         width.setValue(0)
+        opacity.setValue(1)
 
         Animated.sequence([
             Animated.delay(1000),
@@ -20,31 +21,52 @@ export default function Splash({ setReady }) {
                 toValue: 300,
                 duration: 700,
                 useNativeDriver: false,
+            }),
+            Animated.delay(250),
+            Animated.timing(opacity, {
+                toValue: 0,
+                duration: 500,
+                useNativeDriver: false,
             })
-        ]).start()
-    }, [width])
+        ]).start(({finished}) => {
+            setReady(finished)
+        })
+    }, [width, opacity, setReady])
 
     return <View style={styles.container}>
         <LinearGradient colors={['#1D8E5C', '#06607a']} style={styles.background}/>
-        <View style={styles.logoContainer}>
+        <Animated.View style={[
+            {
+                ...styles.logoContainer,
+                opacity,
+            }
+        ]}>
             <Image
                 source={isotipoNegativo}
                 style={styles.isotipo}
                 contentFit={'contain'}
             />
-            <Animated.Image
-                source={utemTexto}
+            <Animated.View
                 style={[
                     {
                         height: 75,
+                        overflow: 'hidden',
                         maxWidth: 230,
-                        marginLeft: 5,
-                        width,
+                        width: width,
                     },
                 ]}
-                resizeMode={'cover'}
-            />
-        </View>
+            >
+                <Image
+                    source={utemTexto}
+                    style={{
+                        height: 75,
+                        width: '100%',
+                    }}
+                    contentFit={'cover'}
+                    contentPosition={'left'}
+                />
+            </Animated.View>
+        </Animated.View>
         <StatusBar style={"dark"}/>
     </View>
 }
