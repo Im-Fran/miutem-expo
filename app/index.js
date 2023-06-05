@@ -1,16 +1,14 @@
+import {useRouter} from "expo-router";
 import {useEffect, useState} from "react";
-import useStoredState from "../src/storage/StoredState";
-import { getStyles } from "../src/utils/Styling";
 
-import {Button, Text, View} from 'react-native';
+import {Button, Text, useColorScheme, View} from 'react-native';
 import {StatusBar} from 'expo-status-bar';
 import Splash from "./splash";
-import {useRouter} from "expo-router";
 
 export default function App() {
     const router = useRouter()
     const [isReady, setReady] = useState(false)
-    const [darkMode, setDarkMode] = useStoredState("darkMode", false)
+    const { toggleColorScheme, darkMode } = useColorScheme()
 
     useEffect(() => {
         setReady(false)
@@ -23,8 +21,8 @@ export default function App() {
         }
     }, [isReady]);
 
-    return isReady ? <View style={getStyles(darkMode).container}>
-        <Text style={getStyles(darkMode).text} onPress={() => setDarkMode(!darkMode)}>Hello, World!</Text>
+    return isReady ? <View className={"flex-1 items-center justify-center bg-white dark:bg-gray-800"}>
+        <Text className={"text-black dark:text-white"} onPress={toggleColorScheme}>Hello, World!</Text>
         <StatusBar style={darkMode ? 'light' : 'dark'}/>
     </View> : <Splash setReady={setReady}/>;
 }

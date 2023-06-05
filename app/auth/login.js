@@ -1,8 +1,7 @@
 import {Video} from "expo-av";
 import {Image} from "expo-image";
 import {StatusBar} from "expo-status-bar";
-import {UserIcon} from "@heroicons/react/24/solid";
-import {StyleSheet, Text, TextInput, View} from "react-native";
+import {Text, TextInput, View} from "react-native";
 
 const backgroundVideo = require('../../assets/login/background.mp4')
 const logoUTEM = require('../../assets/utem/utem_logo_color_blanco.png')
@@ -33,15 +32,3 @@ export default function Login({ }) {
         <StatusBar style={'dark'}/>
     </View>
 }
-
-const styles = StyleSheet.create({
-    view: {
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'space-around',
-    },
-    madeWith: {
-        color: 'white',
-        textAlign: 'center',
-    },
-})
