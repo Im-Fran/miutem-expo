@@ -1,9 +1,10 @@
-import {useEffect, useState} from "react";
+import {useState} from "react";
+import { useToast } from "react-native-toast-notifications";
 
 import { AntDesign } from '@expo/vector-icons';
 import {Video} from "expo-av";
 import {Image} from "expo-image";
-import {Button, Text, TextInput, View} from "react-native";
+import {Button, StyleSheet, Text, TextInput, View} from "react-native";
 import Layout from "../layouts/Layout";
 
 const backgroundVideo = require('../../assets/login/background.mp4')
@@ -11,12 +12,13 @@ const logoUTEM = require('../../assets/utem/utem_logo_color_blanco.png')
 
 export default function Login({ }) {
 
+    const toast = useToast();
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
 
     const submit = () => {
         if(/^[a-zA-Z0-9._%+-]+@utem\.cl$/g.test(email) === false) {
-            alert('Correo inválido!')
+            console.log(toast)
             return
         }
         alert(`${email}:${password}`)
@@ -30,10 +32,10 @@ export default function Login({ }) {
             resizeMode="cover"
             shouldPlay
             isLooping
-            className={"absolute w-full h-full inset-0"}
+            style={StyleSheet.absoluteFill}
         />
 
-        <View className={"absolute w-full h-full inset-0 bg-black/40"}/>
+        <View style={StyleSheet.absoluteFill} className={"bg-black/40"}/>
 
         <View className={"flex-1 w-full relative py-20 items-center"}>
             <Image
@@ -93,7 +95,7 @@ export default function Login({ }) {
 
             </View>
 
-            <Text className={"absolute bottom-0 mb-10 text-white text-center text-[16px]"}>Hecho con ❤️ por el <Text className={"font-bold"}>Club de Desarrollo Experimental</Text> junto a SISEI</Text>
+            <Text className={"absolute bottom-0 text-white text-center text-[16px]"}>Hecho con ❤️ por el <Text className={"font-bold"}>Club de Desarrollo Experimental</Text> junto a SISEI</Text>
         </View>
     </Layout>
 }

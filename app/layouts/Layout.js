@@ -1,17 +1,16 @@
 import {StatusBar} from "expo-status-bar";
-import {useColorScheme, View} from "react-native";
-
+import {SafeAreaView, useColorScheme, View} from "react-native";
+import { ToastProvider } from 'react-native-toast-notifications'
 
 export default function Layout({ children, className = '', statusBarStyle = null, hideStatusBar = false }) {
     const { darkMode } = useColorScheme();
 
     return <>
-        <>
-            <View className={`flex-1 items-center justify-center ${className}`}>
-
+        <ToastProvider>
+            <SafeAreaView className={`flex-1 items-center justify-center ${className}`}>
                 {children}
-            </View>
-        </>
+            </SafeAreaView>
+        </ToastProvider>
         <StatusBar style={statusBarStyle || (darkMode ? 'light' : 'dark')} hidden={hideStatusBar}/>
     </>
 }
