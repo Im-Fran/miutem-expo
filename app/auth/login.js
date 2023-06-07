@@ -1,11 +1,9 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
 
-import {StatusBar} from "expo-status-bar";
 import { AntDesign } from '@expo/vector-icons';
 import {Video} from "expo-av";
 import {Image} from "expo-image";
 import {Button, Text, TextInput, View} from "react-native";
-import {useForm, Controller} from "react-hook-form";
 import Layout from "../layouts/Layout";
 
 const backgroundVideo = require('../../assets/login/background.mp4')
@@ -18,13 +16,13 @@ export default function Login({ }) {
 
     const submit = () => {
         if(/^[a-zA-Z0-9._%+-]+@utem\.cl$/g.test(email) === false) {
-            alert("Email inválido")
+            alert('Correo inválido!')
             return
         }
         alert(`${email}:${password}`)
     }
 
-    return <Layout>
+    return <Layout hideStatusBar>
         <Video
             source={backgroundVideo}
             rate={1}
@@ -97,6 +95,5 @@ export default function Login({ }) {
 
             <Text className={"absolute bottom-0 mb-10 text-white text-center text-[16px]"}>Hecho con ❤️ por el <Text className={"font-bold"}>Club de Desarrollo Experimental</Text> junto a SISEI</Text>
         </View>
-        <StatusBar style={'dark'}/>
     </Layout>
 }

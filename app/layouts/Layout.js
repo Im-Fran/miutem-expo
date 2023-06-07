@@ -1,12 +1,17 @@
-import {useColorScheme, View} from "react-native";
 import {StatusBar} from "expo-status-bar";
+import {useColorScheme, View} from "react-native";
 
-export default function Layout({ children, hideStatusBar = false }) {
+
+export default function Layout({ children, className = '', statusBarStyle = null, hideStatusBar = false }) {
     const { darkMode } = useColorScheme();
 
-    return <View className={"flex-1 items-center justify-center"}>
-        <StatusBar style={darkMode ? 'light' : 'dark'} hidden={hideStatusBar}/>
+    return <>
+        <>
+            <View className={`flex-1 items-center justify-center ${className}`}>
 
-        {children}
-    </View>
+                {children}
+            </View>
+        </>
+        <StatusBar style={statusBarStyle || (darkMode ? 'light' : 'dark')} hidden={hideStatusBar}/>
+    </>
 }

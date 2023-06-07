@@ -1,12 +1,13 @@
 import {useEffect, useRef} from "react";
 import Constants from "expo-constants"
-import {StatusBar} from "expo-status-bar";
-import {StyleSheet, Animated, View, Text} from "react-native";
+import {StyleSheet, Animated, Text} from "react-native";
 import {LinearGradient} from 'expo-linear-gradient';
 import {Image} from "expo-image";
+import Layout from "./layouts/Layout";
 
 const isotipoNegativo = require('../assets/utem/utem_isotipo_negativo.png')
 const utemTexto = require('../assets/utem/UTEM_Texto.png')
+
 export default function Splash({ setReady }) {
 
     const opacity = useRef(new Animated.Value(1)).current
@@ -34,24 +35,18 @@ export default function Splash({ setReady }) {
         })
     }, [width, opacity, setReady])
 
-    return <View style={styles.container}>
-        <LinearGradient colors={['#1D8E5C', '#06607a']} style={styles.background}/>
-        <Animated.View style={[
-            {
-                ...styles.logoContainer,
-                opacity,
-            }
-        ]}>
+    return <Layout>
+        <LinearGradient colors={['#1D8E5C', '#06607a']} style={StyleSheet.absoluteFill}/>
+        <Animated.View className={"flex-1 flex-row items-center justify-center w-full"} style={[{ opacity }]}>
             <Image
                 source={isotipoNegativo}
-                style={styles.isotipo}
+                className={"w-20 h-20"}
                 contentFit={'contain'}
             />
             <Animated.View
+                className={"h-20 overflow-hidden"}
                 style={[
                     {
-                        height: 75,
-                        overflow: 'hidden',
                         maxWidth: 230,
                         width: width,
                     },
@@ -59,56 +54,14 @@ export default function Splash({ setReady }) {
             >
                 <Image
                     source={utemTexto}
-                    style={{
-                        height: 75,
-                        width: '100%',
-                    }}
+                    className={"w-full h-full"}
                     contentFit={'cover'}
                     contentPosition={'left'}
                 />
             </Animated.View>
         </Animated.View>
-        <Animated.View style={[
-            {
-                opacity,
-            }
-        ]}>
-            <Text style={styles.version}>Versión <Text style={{ fontWeight: 'bold' }}>{Constants.expoConfig.version}</Text></Text>
+        <Animated.View style={[{ opacity }]}>
+            <Text className={"mb-5 text-white text-lg"}>Versión <Text className={"font-bold"}>{Constants.expoConfig.version}</Text></Text>
         </Animated.View>
-        <StatusBar hidden/>
-    </View>
+    </Layout>
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        width: '100%'
-    },
-    background: {
-        position: 'absolute',
-        width: '100%',
-        height: '100%',
-        left: 0,
-        top: 0,
-    },
-    logoContainer: {
-        flex: 1,
-        flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems: 'center',
-        width: '100%'
-    },
-
-    isotipo: {
-        width: 65,
-        height: 65,
-    },
-
-    version: {
-        marginBottom: 20,
-        color: 'white',
-        fontSize: 16,
-    },
-})

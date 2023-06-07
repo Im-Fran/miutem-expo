@@ -1,14 +1,14 @@
 import {useRouter} from "expo-router";
 import {useEffect, useState} from "react";
 
-import {Button, Text, useColorScheme, View} from 'react-native';
-import {StatusBar} from 'expo-status-bar';
+import {Text, useColorScheme } from 'react-native';
 import Splash from "./splash";
+import Layout from "./layouts/Layout";
 
 export default function App() {
     const router = useRouter()
     const [isReady, setReady] = useState(false)
-    const { toggleColorScheme, darkMode } = useColorScheme()
+    const { toggleColorScheme } = useColorScheme()
 
     useEffect(() => {
         setReady(false)
@@ -21,8 +21,7 @@ export default function App() {
         }
     }, [isReady]);
 
-    return isReady ? <View className={"flex-1 items-center justify-center bg-white dark:bg-gray-800"}>
+    return isReady ? <Layout className={"bg-white dark:bg-gray-800"}>
         <Text className={"text-black dark:text-white"} onPress={toggleColorScheme}>Hello, World!</Text>
-        <StatusBar style={darkMode ? 'light' : 'dark'}/>
-    </View> : <Splash setReady={setReady}/>;
+    </Layout> : <Splash setReady={setReady}/>;
 }
