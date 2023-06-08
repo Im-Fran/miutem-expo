@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
 
 import { useToast } from "../components/Toasts"
 import { AntDesign } from '@expo/vector-icons';
@@ -6,19 +6,38 @@ import {Video} from "expo-av";
 import {Image} from "expo-image";
 import {Button, StyleSheet, Text, TextInput, View} from "react-native";
 import Layout from "../layouts/Layout";
+import * as SecureStore from "expo-secure-store";
+import {useRouter} from "expo-router";
 
 const backgroundVideo = require('../../assets/login/background.mp4')
 const logoUTEM = require('../../assets/utem/utem_logo_color_blanco.png')
 
 export default function Login({ }) {
 
+    const router = useRouter();
     const {toast} = useToast();
+    const [isLoggedIn, setLoggedIn] = useState(false)
+
+    useEffect(() => {
+        SecureStore.getItemAsync('username').then(username => setLoggedIn(username !== null))
+    }, [])
+
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
 
     const submit = () => {
+        if(isLoggedIn) {
+            toast({
+                message: 'Ya has iniciado sesión!',
+                callback: () => router.push('/home')
+            })
+            return
+        }
+
         if(/^[a-zA-Z0-9._%+-]+@utem\.cl$/g.test(email) === false) {
-            toast('El correo ingresado no es válido')
+            toast({
+                message: 'El correo ingresado no es válido',
+            })
             return
         }
         alert(`${email}:${password}`)

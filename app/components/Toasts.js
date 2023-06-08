@@ -93,9 +93,12 @@ const Toast = ({ toast, setToasts }) => {
             useNativeDriver: false,
         }).start(() => {
             // Remove the toast from the state
-            setToasts((prevToasts) =>
-                prevToasts.filter((prevToast) => prevToast.id !== toast.id)
-            );
+            setToasts((prevToasts) => {
+                if(toast.callback && typeof toast.callback === 'function') {
+                    toast.callback();
+                }
+                return prevToasts.filter((prevToast) => prevToast.id !== toast.id)
+            });
         });
     };
 
@@ -183,7 +186,7 @@ const styles = StyleSheet.create({
 });
 
 export const useToast = () => {
-    const toast = (message, ...rest) =>
+    const toast = ({ message, ...rest }) =>
         DeviceEventEmitter.emit('toast', {
             message,
             ...rest,
