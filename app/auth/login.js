@@ -1,6 +1,6 @@
 import {useState} from "react";
-import { useToast } from "react-native-toast-notifications";
 
+import { useToast } from "../components/Toasts"
 import { AntDesign } from '@expo/vector-icons';
 import {Video} from "expo-av";
 import {Image} from "expo-image";
@@ -12,13 +12,13 @@ const logoUTEM = require('../../assets/utem/utem_logo_color_blanco.png')
 
 export default function Login({ }) {
 
-    const toast = useToast();
+    const {toast} = useToast();
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
 
     const submit = () => {
         if(/^[a-zA-Z0-9._%+-]+@utem\.cl$/g.test(email) === false) {
-            console.log(toast)
+            toast('El correo ingresado no es válido')
             return
         }
         alert(`${email}:${password}`)
