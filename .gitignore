@@ -18,3 +18,8 @@ web-build/
 .env
 .env.*
 !.env.example
+
+# Build files
+credentials.json
+ios/
+android/

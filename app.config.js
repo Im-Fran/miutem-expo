@@ -31,7 +31,7 @@ module.exports = {
     ],
     ios: {
         supportsTablet: true,
-        bundleIdentifier: "cl.franciscosolis.miutem",
+        bundleIdentifier: process.env.ENV === 'production' ? 'cl.utem.miutem' : "cl.franciscosolis.miutem",
         config: {
             usesNonExemptEncryption: false,
         },
@@ -45,7 +45,7 @@ module.exports = {
             "android.permission.RECORD_AUDIO",
             "android.permission.MODIFY_AUDIO_SETTINGS",
         ],
-        package: "cl.franciscosolis.miutem",
+        package: process.env.ENV === 'production' ? 'cl.utem.miutem' : "cl.franciscosolis.miutem",
     },
     extra: {
         apiUrl: process.env.MI_UTEM_API_DEBUG || 'https://api.exdev.cl',
