@@ -1,18 +1,11 @@
 {
     "build": {
-        "development": {
-            "developmentClient": true,
-            "distribution": "internal"
-        },
-        "preview": {
-            "distribution": "internal"
-        },
-        "production": {},
-        "development-simulator": {
-            "developmentClient": true,
-            "distribution": "internal",
+        "default": {
             "ios": {
-                "simulator": true
+                "credentialsSource": "local"
+            },
+            "android": {
+                "credentialsSource": "local"
             }
         }
     }
