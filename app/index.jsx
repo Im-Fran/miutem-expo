@@ -1,23 +1,24 @@
+import {useRouter} from "expo-router";
+import AuthService from "./backend/services/AuthService";
 import {useEffect, useRef, useState} from "react";
 import Constants from "expo-constants"
+
 import {StyleSheet, Animated, Text} from "react-native";
 import {LinearGradient} from 'expo-linear-gradient';
 import {Image} from "expo-image";
 import Layout from "./layouts/Layout";
-import {useRouter} from "expo-router";
-import * as SecureStore from 'expo-secure-store';
 
 const isotipoNegativo = require('../assets/utem/utem_isotipo_negativo.png')
 const utemTexto = require('../assets/utem/UTEM_Texto.png')
 
 export default function Splash({}) {
-    const [username, setUsername] = useState('');
+    const [isLoggedIn, setLoggedIn] = useState(false);
     const router = useRouter();
     const opacity = useRef(new Animated.Value(1)).current
     const width = useRef(new Animated.Value(0)).current
 
     useEffect(() => {
-        SecureStore.getItemAsync('username').then(res => setUsername(res || ''))
+        AuthService.hasValidToken().then(setLoggedIn)
         width.setValue(0)
         opacity.setValue(1)
 
@@ -37,7 +38,7 @@ export default function Splash({}) {
         ]).start(({finished}) => {
             if(!finished) return;
 
-            if(username?.length > 0) {
+            if(isLoggedIn) {
                 router.push('/home');
             } else {
                 router.push('/auth/login');
@@ -71,7 +72,7 @@ export default function Splash({}) {
             </Animated.View>
         </Animated.View>
         <Animated.View style={[{ opacity }]}>
-            <Text className={"mb-5 text-white text-lg"}>Versión <Text className={"font-bold"}>{Constants.expoConfig.version}</Text></Text>
+            <Text className={"text-white text-lg"}>Versión <Text className={"font-bold"}>{Constants.expoConfig.version}</Text></Text>
         </Animated.View>
     </Layout>
 }

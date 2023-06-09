@@ -14,9 +14,19 @@ const useStoredState = <T>(key: string, defaultValue: T): [T, (newValue: T) => v
             try {
                 const fromStorage = await AsyncStorage.getItem(key)
                 if (fromStorage) {
-                    value = JSON.parse(fromStorage)
+                    let json = null
+                    try {
+                        json = JSON.parse(fromStorage)
+                    }catch (_){}
+
+                    value = json != null ? json : fromStorage
                 }
-            } catch (e) {}
+            } catch (e) {
+                console.log({
+                    key,
+                    error: e,
+                })
+            }
 
             return value
         }

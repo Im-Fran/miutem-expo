@@ -1,11 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
+
 import { View, Text, StyleSheet, DeviceEventEmitter, Animated, PanResponder } from 'react-native';
+import Constants from "expo-constants";
 
 export default function ToastProvider({ children }) {
     const [toasts, setToasts] = useState([]);
 
     useEffect(() => {
         const listener = DeviceEventEmitter.addListener('toast', ({ message, ...rest }) => {
+            if(rest.debug && Constants.expoConfig.extra.env !== 'production') {
+                console.debug(rest.debug)
+            }
+
             setToasts(prevToasts => [
                 ...prevToasts,
                 {
@@ -113,6 +119,7 @@ const Toast = ({ toast, setToasts }) => {
             style={[
                 styles.toast,
                 {
+                    backgroundColor: toast.color || '#009d9b',
                     opacity: animation,
                     transform: [
                         {
@@ -153,7 +160,6 @@ const styles = StyleSheet.create({
     },
     toast: {
         position: 'relative',
-        backgroundColor: '#009d9b',
         borderTopLeftRadius: 8,
         borderTopRight: 8,
         padding: 16,
@@ -186,11 +192,13 @@ const styles = StyleSheet.create({
 });
 
 export const useToast = () => {
-    const toast = ({ message, ...rest }) =>
+    const toast = (data: any) => {
+        let { message, ...rest } = typeof data === 'string' ? { message: data } : data;
         DeviceEventEmitter.emit('toast', {
             message,
             ...rest,
         });
+    }
 
     return { toast };
 };
