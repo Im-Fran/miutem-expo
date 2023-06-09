@@ -4,7 +4,6 @@ import {useEffect, useState} from "react";
 import {useRouter} from "expo-router";
 import {useToast} from "../components/Toasts"
 import useStoredState from "../backend/storage/StoredState";
-import * as SecureStore from "expo-secure-store";
 
 import {AntDesign} from '@expo/vector-icons';
 import {ResizeMode, Video} from "expo-av";
@@ -13,7 +12,7 @@ import {Button, StyleSheet, Text, TextInput, View, TouchableWithoutFeedback, Key
 import Layout from "../layouts/Layout";
 import Constants from "expo-constants";
 import {useLoadingToast} from "../components/LoadingToasts";
-import {useTime} from "../backend/services/TimeService";
+import dayjs from "dayjs";
 
 const backgroundVideo = require('../../assets/login/background.mp4')
 const logoUTEM = require('../../assets/utem/utem_logo_color_blanco.png')
@@ -24,49 +23,50 @@ export default function Login({ }) {
     const router = useRouter();
     const {toast} = useToast();
     const loadingToast = useLoadingToast();
-    const dayjs = useTime()
 
     /* Auth Form */
     const [email, setEmail] = useState('')
 
     const [password, setPassword] = useState('')
     const [loginUnlocksAt, setLoginUnlocksAt] = useStoredState('loginUnlocksAt', 'none')
-    const [lastLoginAt] = useStoredState('lastLoginAt', 'none')
+    const [lastLoginAt] = useStoredState('lastLoginAt')
 
-    const [_, setTries] = useStoredState('loginTries', 0)
+    const [_, setTries] = useStoredState('loginTries', '0')
 
     useEffect(() => {
-        AuthService.hasValidToken().then(valid => {
-            if(valid) {
-                // Set loading toast
-                loadingToast(true)
+        if(!lastLoginAt) return
+        loadingToast(true) // Mostrar toast cargando
 
-                // If last login was less than 6 hours ago
-                const lastLogin = dayjs(lastLoginAt)
-                if(lastLogin.diff(dayjs(), 'hours') < 6) {
-                    // Redirect to home
-                    loadingToast(false)
-                    router.push('/home')
-                } else {
-                    AuthService.refreshToken().then(async (loggedIn) => {
-                        if(!loggedIn) {
-                            await AuthService.logout()
-                        }
-                    })
-                }
+        AuthService.hasValidToken().then(valid => { // Validar el token
+            if(!valid) return
+
+            if(lastLoginAt && dayjs(lastLoginAt).diff(dayjs(), 'hours') < 6) { // Si el login fue hace menos de 6 horas (el token dura 1 día)
+                // Redirect to home
+                router.push('/home')
+                return
             }
+
+            AuthService.refreshToken().then(async (loggedIn) => { // Refrescar token
+                if(!loggedIn) {
+                    await AuthService.logout() // No pudimos, solicitamos otro login
+                } else {
+                    router.push('/home') // Vamos al inicio!
+                }
+            })
+        }).finally(() => {
+            loadingToast(false) // Ocultar toast cargando
         })
-    }, [])
+    }, [lastLoginAt])
 
     useEffect(() => {
-        if(Constants.expoConfig.extra.env !== 'production') {
+        if(Constants.expoConfig.extra.env !== 'production') { // Si no estamos en producción, no bloquear el login
             setLoginUnlocksAt('none')
-            setTries(0)
+            setTries('0')
         }
     }, [loginUnlocksAt])
 
     const submit = async () => {
-        if(/^[a-zA-Z0-9._%+-]+@utem\.cl$/g.test(email) === false) {
+        if(/^[a-zA-Z0-9._%+-]+@utem\.cl$/g.test(email) === false) { // Validar correo
             toast({
                 message: 'El correo ingresado no es válido',
                 color: 'red',
@@ -74,7 +74,7 @@ export default function Login({ }) {
             return
         }
 
-        if(password?.length === 0) {
+        if(password?.length === 0) { // Validar contraseña
             toast({
                 message: 'Debes ingresar una contraseña',
                 color: 'red'
@@ -82,7 +82,7 @@ export default function Login({ }) {
             return
         }
 
-        // Show loading toast
+        // Intenta login
         AuthService.attemptLogin(email, password).then(loggedIn => {
             if(loggedIn) {
                 router.push('/home')
@@ -112,7 +112,7 @@ export default function Login({ }) {
                 />
 
                 <View className={"flex items-center w-full h-full gap-5"}>
-                    {/* Email */}
+                    {/* Correo */}
                     <View className={"flex flex-row items-center bg-black/40 border border-white/60 rounded-full px-2"}>
                         <View className={"py-4 px-2 rounded-l-lg h-full"}>
                             <AntDesign
@@ -130,7 +130,7 @@ export default function Login({ }) {
                         />
                     </View>
 
-                    {/* Password */}
+                    {/* Clave */}
                     <View className={"flex flex-row items-center bg-black/40 border border-white/60 rounded-full px-2"}>
                         <View className={"py-4 px-2 rounded-l-lg h-full"}>
                             <AntDesign
@@ -151,7 +151,7 @@ export default function Login({ }) {
                         />
                     </View>
 
-                    {/* Login Button */}
+                    {/* Botón login */}
                     <View className={"bg-primary-100 rounded-full px-2"}>
                         <Button
                             color={"white"}

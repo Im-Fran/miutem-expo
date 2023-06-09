@@ -18,7 +18,12 @@ export default function Splash({}) {
     const width = useRef(new Animated.Value(0)).current
 
     useEffect(() => {
-        AuthService.hasValidToken().then(setLoggedIn)
+        AuthService.hasValidToken().then(valid => {
+            setLoggedIn(() => valid)
+        })
+    }, [])
+
+    useEffect(() => {
         width.setValue(0)
         opacity.setValue(1)
 
@@ -44,7 +49,7 @@ export default function Splash({}) {
                 router.push('/auth/login');
             }
         })
-    }, [width, opacity])
+    }, [width, opacity, isLoggedIn])
 
     return <Layout>
         <LinearGradient colors={['#1D8E5C', '#06607a']} style={StyleSheet.absoluteFill}/>

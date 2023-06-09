@@ -1,11 +1,11 @@
 import createSecureStore from '@neverdull-agency/expo-unlimited-secure-store';
 import * as SecureStore from 'expo-secure-store'
 import {useToast} from "../../components/Toasts";
-import {useTime} from "./TimeService";
 import Constants from "expo-constants";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {useLoadingToast} from "../../components/LoadingToasts";
 import axios from "axios";
+import dayjs from "dayjs";
 
 class AuthService {
 
@@ -14,6 +14,12 @@ class AuthService {
     static async hasValidToken(): Promise<boolean> {
         const token = await this.secureStore.getItem('token') // Obtener token del Secure Store
         if (!token) return false // Si no hay token, no es valido
+
+        const lastLogin = await AsyncStorage.getItem('lastLoginAt') // Obtener ultimo login
+        if (!lastLogin) return false // Si no hay ultimo login, no es valido
+
+        const user = await this.fetchUser()
+        if(!user) return false
 
         let code; // Codigo, deberia de ser 200
         try {
@@ -28,14 +34,13 @@ class AuthService {
             code = e?.status || 0 // Aquí claramente es un error
         }
 
-        return code === 200
+        return code === 200 && (dayjs(lastLogin).diff(dayjs(), 'hours') < 6) // Si el codigo es 200 y el ultimo login fue hace menos de 6 horas, es valido
     }
 
     // Intenta el login
     static async attemptLogin(username: string, password: string) {
         const { toast } = useToast()
         const loadingToast = useLoadingToast()
-        const dayjs = useTime();
         const tries = parseInt(await AsyncStorage.getItem('loginTries')) || 0
         const loginUnlocksAt = await AsyncStorage.getItem('loginUnlocksAt') || 'none'
 
@@ -55,7 +60,9 @@ class AuthService {
 
         if(response.status === 200) { // Login exitoso
             // Guardar usuario, clave, token, ultimo login, y reiniciar intentos
-            await this.saveTokens(username, password, response.data.token)
+            const data = response.data
+            await this.saveTokens(username, password, data.token)
+            await this.saveUser(data)
 
             loadingToast(false) // Desactiva el loading toast
             return true
@@ -89,17 +96,58 @@ class AuthService {
         const response = await this.postLogin(username, password)
         if(response.status === 200) {
             // Guarda las nuevas claves
-            await this.saveTokens(username, password, response.data.token, false)
+            const data = response.data
+            await this.saveTokens(username, password, data.token, false)
+            await this.saveUser(data)
             return true
         }
+
+        return false
+    }
+
+    static async fetchUser() {
+        let userData = await this.secureStore.getItem('user')
+        if(!userData) return null
+        let user = JSON.parse(userData)
+
+        if(dayjs(user.requestedAt).diff(dayjs(), 'minutes') > 15) {
+            const username = await SecureStore.getItemAsync('username')
+            const password = await SecureStore.getItemAsync('password')
+
+            if (!username || !password) return null
+
+            // Intenta obtener nuevos datos
+            const response = await this.postLogin(username, password)
+            if(response.status === 200) {
+                // Guarda los nuevos datos
+                const data = response.data
+                await this.saveTokens(username, password, data.token, false)
+                await this.saveUser(data)
+                return data
+            } else {
+                await this.logout()
+                return null
+            }
+        }
+
+        return user
     }
 
     static async logout() {
         // Delete token and lastLoginAt
         await this.secureStore.removeItem('token')
+        await this.secureStore.removeItem('user')
         await AsyncStorage.removeItem('lastLoginAt')
         await SecureStore.deleteItemAsync('username')
         await SecureStore.deleteItemAsync('password')
+    }
+
+    private static async saveUser(data) {
+        delete data.token
+        await this.secureStore.setItem('user', JSON.stringify({
+            ...data,
+            requestedAt: dayjs().toISOString(),
+        }))
     }
 
     private static async postLogin(username: string, password: string) {
@@ -119,7 +167,6 @@ class AuthService {
     }
 
     private static async saveTokens(username: string, password: string, token: string, resetTries: boolean = true) {
-        const dayjs = useTime();
         await SecureStore.setItemAsync('username', username)
         await SecureStore.setItemAsync('password', password)
         await this.secureStore.setItem('token', token)
