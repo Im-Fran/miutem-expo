@@ -6,6 +6,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import {useLoadingToast} from "../../components/LoadingToasts";
 import axios from "axios";
 import dayjs from "dayjs";
+import User from "../models/User";
 
 class AuthService {
 
@@ -123,14 +124,16 @@ class AuthService {
                 const data = response.data
                 await this.saveTokens(username, password, data.token, false)
                 await this.saveUser(data)
-                return data
+                user = data
             } else {
                 await this.logout()
                 return null
             }
         }
 
-        return user
+        return new User({
+            ...user,
+        })
     }
 
     static async logout() {
@@ -161,7 +164,7 @@ class AuthService {
                 },
             })
         } catch (response) {
-            console.debug(response.status, response.statusText, '/v1/auth', new Date().getTime())
+            console.debug(response.status, response.statusText, '/v1/auth', new Date().toISOString())
             return response
         }
     }

@@ -8,7 +8,16 @@ import useStoredState from "../backend/storage/StoredState";
 import {AntDesign} from '@expo/vector-icons';
 import {ResizeMode, Video} from "expo-av";
 import {Image} from "expo-image";
-import {Button, StyleSheet, Text, TextInput, View, TouchableWithoutFeedback, Keyboard} from "react-native";
+import {
+    Button,
+    StyleSheet,
+    Text,
+    TextInput,
+    View,
+    TouchableWithoutFeedback,
+    Keyboard,
+    SafeAreaView
+} from "react-native";
 import Layout from "../layouts/Layout";
 import Constants from "expo-constants";
 import {useLoadingToast} from "../components/LoadingToasts";
@@ -26,8 +35,8 @@ export default function Login({ }) {
 
     /* Auth Form */
     const [email, setEmail] = useState('')
-
     const [password, setPassword] = useState('')
+
     const [loginUnlocksAt, setLoginUnlocksAt] = useStoredState('loginUnlocksAt', 'none')
     const [lastLoginAt] = useStoredState('lastLoginAt')
 
@@ -38,9 +47,7 @@ export default function Login({ }) {
         loadingToast(true) // Mostrar toast cargando
 
         AuthService.hasValidToken().then(valid => { // Validar el token
-            if(!valid) return
-
-            if(lastLoginAt && dayjs(lastLoginAt).diff(dayjs(), 'hours') < 6) { // Si el login fue hace menos de 6 horas (el token dura 1 día)
+            if(lastLoginAt && dayjs(lastLoginAt).diff(dayjs(), 'hours') < 6 && valid) { // Si el login fue hace menos de 6 horas (el token dura 1 día)
                 // Redirect to home
                 router.push('/home')
                 return
@@ -90,80 +97,82 @@ export default function Login({ }) {
         })
     }
 
-    return <Layout hideStatusBar>
-        <Video
-            source={backgroundVideo}
-            rate={1}
-            isMuted
-            resizeMode={ResizeMode.COVER}
-            shouldPlay
-            isLooping
-            style={StyleSheet.absoluteFill}
-        />
+    return <SafeAreaView className={"flex-1 items-center justify-center"}>
+        <Layout hideStatusBar>
+            <Video
+                source={backgroundVideo}
+                rate={1}
+                isMuted
+                resizeMode={ResizeMode.COVER}
+                shouldPlay
+                isLooping
+                style={StyleSheet.absoluteFill}
+            />
 
-        <View style={StyleSheet.absoluteFill} className={"bg-black/40"}/>
+            <View style={StyleSheet.absoluteFill} className={"bg-black/40"}/>
 
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-            <View className={"flex-1 w-full relative py-20 items-center"}>
-                <Image
-                    source={logoUTEM}
-                    contentFit={'contain'}
-                    className={"my-10 bg-contain w-64 h-32"}
-                />
+            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                <View className={"flex-1 w-full relative py-20 items-center"}>
+                    <Image
+                        source={logoUTEM}
+                        contentFit={'contain'}
+                        className={"my-10 bg-contain w-64 h-32"}
+                    />
 
-                <View className={"flex items-center w-full h-full gap-5"}>
-                    {/* Correo */}
-                    <View className={"flex flex-row items-center bg-black/40 border border-white/60 rounded-full px-2"}>
-                        <View className={"py-4 px-2 rounded-l-lg h-full"}>
-                            <AntDesign
-                                name={"user"}
-                                size={24}
-                                color={"white"}
-                            />
-                        </View>
-                        <TextInput
-                            className={"text-white py-4 px-2 rounded-r-lg w-3/4 h-full"}
-                            placeholder={"usuario@utem.cl"}
-                            autoComplete={"username"}
-                            value={email}
-                            onChangeText={setEmail}
-                        />
-                    </View>
-
-                    {/* Clave */}
-                    <View className={"flex flex-row items-center bg-black/40 border border-white/60 rounded-full px-2"}>
-                        <View className={"py-4 px-2 rounded-l-lg h-full"}>
-                            <AntDesign
-                                name={"key"}
-                                size={24}
-                                color={"white"}
+                    <View className={"flex items-center w-full h-full gap-5"}>
+                        {/* Correo */}
+                        <View className={"flex flex-row items-center bg-black/40 border border-white/60 rounded-full px-2"}>
+                            <View className={"py-4 px-2 rounded-l-lg h-full"}>
+                                <AntDesign
+                                    name={"user"}
+                                    size={24}
+                                    color={"white"}
+                                />
+                            </View>
+                            <TextInput
+                                className={"text-white py-4 px-2 rounded-r-lg w-3/4 h-full"}
+                                placeholder={"usuario@utem.cl"}
+                                autoComplete={"username"}
+                                value={email}
+                                onChangeText={setEmail}
                             />
                         </View>
 
-                        <TextInput
-                            className={"text-white py-4 px-2 rounded-r-lg w-3/4 h-full"}
-                            placeholder={"• • • • • • • • •"}
-                            value={password}
-                            onChangeText={setPassword}
-                            textContentType={"password"}
-                            secureTextEntry={true}
-                            autoComplete={"current-password"}
-                        />
+                        {/* Clave */}
+                        <View className={"flex flex-row items-center bg-black/40 border border-white/60 rounded-full px-2"}>
+                            <View className={"py-4 px-2 rounded-l-lg h-full"}>
+                                <AntDesign
+                                    name={"key"}
+                                    size={24}
+                                    color={"white"}
+                                />
+                            </View>
+
+                            <TextInput
+                                className={"text-white py-4 px-2 rounded-r-lg w-3/4 h-full"}
+                                placeholder={"• • • • • • • • •"}
+                                value={password}
+                                onChangeText={setPassword}
+                                textContentType={"password"}
+                                secureTextEntry={true}
+                                autoComplete={"current-password"}
+                            />
+                        </View>
+
+                        {/* Botón login */}
+                        <View className={"bg-primary-100 rounded-full px-2"}>
+                            <Button
+                                color={"white"}
+                                title={"Iniciar Sesión"}
+                                onPress={() => submit()}
+                            />
+                        </View>
+
                     </View>
 
-                    {/* Botón login */}
-                    <View className={"bg-primary-100 rounded-full px-2"}>
-                        <Button
-                            color={"white"}
-                            title={"Iniciar Sesión"}
-                            onPress={() => submit()}
-                        />
-                    </View>
-
+                    <Text className={"absolute bottom-0 text-white text-center text-[16px]"}>Hecho con ❤️ por el <Text className={"font-bold"}>Club de Desarrollo Experimental</Text> junto a SISEI</Text>
                 </View>
-
-                <Text className={"absolute bottom-0 text-white text-center text-[16px]"}>Hecho con ❤️ por el <Text className={"font-bold"}>Club de Desarrollo Experimental</Text> junto a SISEI</Text>
-            </View>
-        </TouchableWithoutFeedback>
-    </Layout>
+            </TouchableWithoutFeedback>
+        </Layout>
+    </SafeAreaView>
 }
